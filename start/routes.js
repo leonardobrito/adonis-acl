@@ -15,11 +15,30 @@
 
 const Route = use('Route')
 
+Route.get('/', () => {
+  return { status: 'It\'s work!' }
+})
+
 Route.post('/sessions', 'SessionController.store')
 
+Route.get('/users', 'UserController.index')
 Route.post('/users', 'UserController.store')
 Route.put('/users/:id', 'UserController.update').middleware('auth')
 
 Route.resource('/posts', 'PostController')
+  .apiOnly()
+  .except(['index', 'show'])
+  .middleware(['auth', 'is:(administrator || moderator)'])
+
+Route.resource('/posts', 'PostController')
+  .apiOnly()
+  .only(['index', 'show'])
+  .middleware(['auth', 'can:(read_posts || read_private_posts)'])
+
+Route.resource('/permissions', 'PermissionController')
+  .apiOnly()
+  .middleware('auth')
+
+  Route.resource('/roles', 'RoleController')
   .apiOnly()
   .middleware('auth')
